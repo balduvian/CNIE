@@ -38,6 +38,9 @@
     <ClCompile Include="GuiTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="baseCnie.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="cnie.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

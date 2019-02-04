@@ -8,12 +8,17 @@ namespace cnie {
 	
 	constexpr int MAX_LOADSTRING = 100;
 
+	HINSTANCE hInstance;
 	WCHAR szTitle[MAX_LOADSTRING];
 	WCHAR szWindowClass[MAX_LOADSTRING];
 
-	HINSTANCE hInstance;
+	ATOM                MyRegisterClass(HINSTANCE hInstance);
+	LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
+	INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-	void setup();
+	HWND window;
+
+	int setup(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow);
 
 	HWND createWindow(bool full);
 	HWND createImageButton(int x, int y, int width, int height);

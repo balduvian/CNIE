@@ -23,7 +23,7 @@
     <ProjectGuid>{9EA6FFBA-BFF3-4FFE-9540-D32F6CE248FD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>GuiTest</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -154,6 +154,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="baseCnie.cpp" />
     <ClCompile Include="cnie.cpp" />
     <ClCompile Include="GuiTest.cpp" />
     <ClCompile Include="stdafx.cpp">
