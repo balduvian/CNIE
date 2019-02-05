@@ -48,10 +48,16 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GuiTest.cpp">
+    <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="guiTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="baseCnie.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cnie.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

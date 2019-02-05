@@ -1,2 +1,6 @@
-﻿  GuiTest.cpp
+﻿  stdafx.cpp
+  cnie.cpp
+  guiTest.cpp
+  baseCnie.cpp
+  Generating Code...
   GuiTest.vcxproj -> C:\Users\Emmet\Programming\lang\cpp\CNIE\Debug\GuiTest.exe

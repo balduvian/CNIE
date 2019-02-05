@@ -1,7 +1,7 @@
-//#include "stdafx.h"
+#include "stdafx.h"
 
 namespace cnie {
-/*
+	
 	#define MAX_LOADSTRING 100
 
 	extern HINSTANCE hInstance;
@@ -10,21 +10,20 @@ namespace cnie {
 	extern HWND base_window;
 	extern void(*startup)();
 
-	int setup(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow, void(*startup)());
+	int setup(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, void(*startup)());
 
 	ATOM myRegisterClass(HINSTANCE hInstance);
-	BOOL InitInstance(bool full);
+	void InitWindow(int nCmdShow);
 	LRESULT CALLBACK wndProc(HWND, UINT, WPARAM, LPARAM);
 	INT_PTR CALLBACK about(HWND, UINT, WPARAM, LPARAM);
 
-	HWND createBlankButton(int x, int y, int width, int height);
-	HWND createImageButton(int x, int y, int width, int height);
-	HWND createTextButton(int x, int y, int width, int height, const wchar_t* text);
+	HWND createBlankButton(int x, int y, int width, int height, int id);
+	HWND createImageButton(int x, int y, int width, int height, int id);
+	HWND createTextButton(int x, int y, int width, int height, const wchar_t* text, int id);
 
 	HANDLE loadBitmap(int id);
 	HANDLE loadBitmap(int id, int w, int h);
 
 	void setButtonImage(HWND button, HANDLE image);
-	*/
 
 }
