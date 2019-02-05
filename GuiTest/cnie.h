@@ -1,30 +1,30 @@
-#pragma once
-
-#include "stdafx.h"
-#include "GuiTest.h"
-#include "resource.h"
+//#include "stdafx.h"
 
 namespace cnie {
-	
-	constexpr int MAX_LOADSTRING = 100;
+/*
+	#define MAX_LOADSTRING 100
 
-	HINSTANCE hInstance;
-	WCHAR szTitle[MAX_LOADSTRING];
-	WCHAR szWindowClass[MAX_LOADSTRING];
+	extern HINSTANCE hInstance;
+	extern WCHAR szTitle[MAX_LOADSTRING];
+	extern WCHAR szWindowClass[MAX_LOADSTRING];
+	extern HWND base_window;
+	extern void(*startup)();
 
-	ATOM                MyRegisterClass(HINSTANCE hInstance);
-	LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-	INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+	int setup(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow, void(*startup)());
 
-	HWND window;
+	ATOM myRegisterClass(HINSTANCE hInstance);
+	BOOL InitInstance(bool full);
+	LRESULT CALLBACK wndProc(HWND, UINT, WPARAM, LPARAM);
+	INT_PTR CALLBACK about(HWND, UINT, WPARAM, LPARAM);
 
-	int setup(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow);
-
-	HWND createWindow(bool full);
+	HWND createBlankButton(int x, int y, int width, int height);
 	HWND createImageButton(int x, int y, int width, int height);
 	HWND createTextButton(int x, int y, int width, int height, const wchar_t* text);
 
 	HANDLE loadBitmap(int id);
+	HANDLE loadBitmap(int id, int w, int h);
+
 	void setButtonImage(HWND button, HANDLE image);
+	*/
 
 }

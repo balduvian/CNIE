@@ -1,0 +1,19 @@
+/*// GuiTest.cpp : Defines the entry point for the application.
+#include "stdafx.h"
+#include "resource.h"
+#include "cnie.h"
+
+HWND button1;
+
+void guiTestStartup() {
+	cnie::createWindow(false);
+	button1 = cnie::createBlankButton(10, 10, 100, 100);
+}
+
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPWSTR    lpCmdLine,
+	_In_ int       nCmdShow)
+{
+	cnie::setup(hInstance, hPrevInstance, lpCmdLine, nCmdShow, guiTestStartup);
+}(*/
