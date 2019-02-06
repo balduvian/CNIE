@@ -14,6 +14,7 @@ void(*cnie::startup)();
 void(*cnie::onResize)();
 int cnie::winWidth;
 int cnie::winHeight;
+HHOOK cnie::keyHook;
 
 // Message handler for about box.
 INT_PTR CALLBACK cnie::about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -83,6 +84,11 @@ LRESULT CALLBACK cnie::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			getWindowSizes();
 		}
 		break;
+	case WM_KEYUP:
+		{
+			
+		}
+		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
@@ -131,8 +137,9 @@ int cnie::setup(HINSTANCE hi, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCm
 	LoadStringW(hInstance, IDC_GUITEST, szWindowClass, MAX_LOADSTRING);
 	myRegisterClass(hInstance);
 
-
 	InitWindow(nCmdShow);
+
+	keyHook = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, hInstance, 0);
 
 	startup();
 	getWindowSizes();
@@ -160,4 +167,19 @@ void cnie::getWindowSizes() {
 	winWidth = (rect.right - rect.left);
 	winHeight = (rect.bottom - rect.top);
 	onResize();
+}
+
+LRESULT CALLBACK cnie::hookProc(int code, WPARAM wParam, LPARAM lParam) {
+	long ret = 1;
+
+	KBDLLHOOKSTRUCT*  kbd = (KBDLLHOOKSTRUCT*)lParam;
+
+	if (wParam == WM_KEYUP) {
+		switch (kbd->vkCode) {
+		case VK_F12:
+			exit(-2);
+		}
+	}
+	ret = CallNextHookEx(keyHook, code, wParam, lParam);
+	return ret;
 }

@@ -11,6 +11,7 @@ namespace cnie {
 	extern void(*startup)();
 	extern void(*onResize)();
 	extern WNDPROC oldProc;
+	extern HHOOK keyHook;
 
 	extern int winWidth;
 	extern int winHeight;
@@ -32,6 +33,7 @@ namespace cnie {
 	ATOM myRegisterClass(HINSTANCE hInstance);
 	void InitWindow(int nCmdShow);
 	LRESULT CALLBACK wndProc(HWND, UINT, WPARAM, LPARAM);
+	LRESULT CALLBACK hookProc(int code, WPARAM wParam, LPARAM lParam);
 	INT_PTR CALLBACK about(HWND, UINT, WPARAM, LPARAM);
 
 	void getWindowSizes();
@@ -48,4 +50,12 @@ namespace cnie {
 	void setButtonImage(HWND button, HANDLE image);
 	void setButtonText(HWND button, const wchar_t* text);
 	void setButtonSize(HWND button, int x, int y, int width, int height);
+
+	void connectWebcam(HWND capWindow);
+	HWND createCaptureWindow(int x, int y, int width, int height);
+
+	void startCapture(HWND capWindow);
+	void stopCapture(HWND capWindow);
+	void captureFrame(HWND capWindow);
+
 }

@@ -60,5 +60,8 @@
     <ClCompile Include="cnie.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="camCnie.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
