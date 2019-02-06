@@ -11,6 +11,9 @@ WCHAR cnie::szTitle[MAX_LOADSTRING];
 WCHAR cnie::szWindowClass[MAX_LOADSTRING];
 HWND cnie::base_window;
 void(*cnie::startup)();
+void(*cnie::onResize)();
+int cnie::winWidth;
+int cnie::winHeight;
 
 // Message handler for about box.
 INT_PTR CALLBACK cnie::about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -75,6 +78,11 @@ LRESULT CALLBACK cnie::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+	case WM_EXITSIZEMOVE:
+		{
+			getWindowSizes();
+		}
+		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
@@ -111,9 +119,10 @@ void cnie::InitWindow(int nCmdShow) {
 	UpdateWindow(hwnd);
 }
 
-int cnie::setup(HINSTANCE hi, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, void(*stp)()) {
+int cnie::setup(HINSTANCE hi, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, void(*stp)(), void(*onr)()) {
 	hInstance = hi;
 	startup = stp;
+	onResize = onr;
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
@@ -126,6 +135,7 @@ int cnie::setup(HINSTANCE hi, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCm
 	InitWindow(nCmdShow);
 
 	startup();
+	getWindowSizes();
 
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_GUITEST));
 
@@ -142,4 +152,12 @@ int cnie::setup(HINSTANCE hi, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCm
 	}
 
 	return (int)msg.wParam;
+}
+
+void cnie::getWindowSizes() {
+	RECT rect;
+	GetClientRect(base_window, &rect);
+	winWidth = (rect.right - rect.left);
+	winHeight = (rect.bottom - rect.top);
+	onResize();
 }

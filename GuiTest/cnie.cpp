@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include "cnie.h"
 
-HWND cnie::createTextButton(int x, int y, int width, int height, const wchar_t* text, int id) {
+//DEFINE FIELDS
+WNDPROC cnie::oldProc;
+
+HWND cnie::createTextButton(int x, int y, int width, int height, const wchar_t* text) {
 	HWND button = CreateWindow(
 		L"BUTTON",
 		text,
@@ -11,7 +14,7 @@ HWND cnie::createTextButton(int x, int y, int width, int height, const wchar_t* 
 		width,
 		height,
 		base_window,
-		(HMENU)id,
+		(HMENU)0,
 		hInstance,
 		NULL
 	);
@@ -19,7 +22,7 @@ HWND cnie::createTextButton(int x, int y, int width, int height, const wchar_t* 
 	return button;
 }
 
-HWND cnie::createBlankButton(int x, int y, int width, int height, int id) {
+HWND cnie::createBlankButton(int x, int y, int width, int height) {
 
 	HWND button = CreateWindow(
 		L"BUTTON",
@@ -30,7 +33,7 @@ HWND cnie::createBlankButton(int x, int y, int width, int height, int id) {
 		width,
 		height,
 		base_window,
-		(HMENU)id,
+		(HMENU)0,
 		hInstance,
 		NULL
 	);
@@ -41,7 +44,7 @@ HWND cnie::createBlankButton(int x, int y, int width, int height, int id) {
 	return button;
 }
 
-HWND cnie::createImageButton(int x, int y, int width, int height, int id) {
+HWND cnie::createImageButton(int x, int y, int width, int height) {
 	HWND button = CreateWindow(
 		L"BUTTON",
 		NULL,
@@ -51,7 +54,7 @@ HWND cnie::createImageButton(int x, int y, int width, int height, int id) {
 		width,
 		height,
 		base_window,
-		(HMENU)id,
+		(HMENU)0,
 		hInstance,
 		NULL
 	);
@@ -86,4 +89,23 @@ HANDLE cnie::loadBitmap(int id, int w, int h) {
 
 void cnie::setButtonImage(HWND button, HANDLE image) {
 	SendMessage(button, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)image);
+}
+
+void cnie::registerProc(HWND button, buttonBack back) {
+	oldProc = (WNDPROC)SetWindowLong(button, GWL_WNDPROC, (LONG)back);
+}
+
+void cnie::setButtonText(HWND button, const wchar_t* text) {
+	SendMessage(button, WM_SETTEXT, NULL, (LPARAM)text);
+}
+
+void cnie::setButtonSize(HWND button, int x, int y, int width, int height) {
+	MoveWindow(
+		button,
+		x,
+		y,
+		width,
+		height,
+		TRUE
+	);
 }

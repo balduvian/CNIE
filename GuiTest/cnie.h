@@ -9,21 +9,43 @@ namespace cnie {
 	extern WCHAR szWindowClass[MAX_LOADSTRING];
 	extern HWND base_window;
 	extern void(*startup)();
+	extern void(*onResize)();
+	extern WNDPROC oldProc;
 
-	int setup(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, void(*startup)());
+	extern int winWidth;
+	extern int winHeight;
+
+	#define buttonProc(name, func)                                                    \
+		LRESULT CALLBACK name(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) { \
+			switch (message) {                                                          \
+				case WM_LBUTTONUP: {                                                     \
+					func();                                                               \
+				}                                                                          \
+			}                                                                               \
+			return CallWindowProc(cnie::oldProc, hwnd, message, wParam, lParam);             \
+		}
+
+	typedef LRESULT (CALLBACK *buttonBack)(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+	int setup(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, void(*startup)(), void(*onResize)());
 
 	ATOM myRegisterClass(HINSTANCE hInstance);
 	void InitWindow(int nCmdShow);
 	LRESULT CALLBACK wndProc(HWND, UINT, WPARAM, LPARAM);
 	INT_PTR CALLBACK about(HWND, UINT, WPARAM, LPARAM);
 
-	HWND createBlankButton(int x, int y, int width, int height, int id);
-	HWND createImageButton(int x, int y, int width, int height, int id);
-	HWND createTextButton(int x, int y, int width, int height, const wchar_t* text, int id);
+	void getWindowSizes();
+
+	HWND createBlankButton(int x, int y, int width, int height);
+	HWND createImageButton(int x, int y, int width, int height);
+	HWND createTextButton(int x, int y, int width, int height, const wchar_t* text);
 
 	HANDLE loadBitmap(int id);
 	HANDLE loadBitmap(int id, int w, int h);
 
-	void setButtonImage(HWND button, HANDLE image);
+	void registerProc(HWND button, buttonBack back);
 
+	void setButtonImage(HWND button, HANDLE image);
+	void setButtonText(HWND button, const wchar_t* text);
+	void setButtonSize(HWND button, int x, int y, int width, int height);
 }
