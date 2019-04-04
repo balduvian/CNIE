@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <functional>
 
 namespace cnie {
 	
@@ -8,39 +9,36 @@ namespace cnie {
 	extern WCHAR szTitle[MAX_LOADSTRING];
 	extern WCHAR szWindowClass[MAX_LOADSTRING];
 	extern HWND base_window;
-	extern void(*startup)();
-	extern void(*onResize)();
-	extern bool(*onButtonClick)(int id);
-	extern WNDPROC oldProc;
-	extern HHOOK keyHook;
 
+	extern std::function<void()> startup;
+	extern std::function<void()> onResize;
+	extern std::function<bool(int)> onButtonClick;
+	extern std::function<void(int)> onKeyPress;
+
+	extern HHOOK keyHook;
 	extern int winWidth;
 	extern int winHeight;
+	extern bool fullscreen;
+	extern long defaultStyle;
 
-	#define buttonProc(name, func)                                                    \
-		LRESULT CALLBACK name(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) { \
-			switch (message) {                                                          \
-				case WM_LBUTTONUP: {                                                     \
-					func();                                                               \
-				}                                                                          \
-			}                                                                               \
-			return CallWindowProc(cnie::oldProc, hwnd, message, wParam, lParam);             \
-		}
+	// camera painting stuff
+	extern HDC camPaint;
+	extern HDC camPaintMem;
+	extern RECT camPaintRect;
+	extern PAINTSTRUCT camPaintStruct;
+	extern HBITMAP camPaintBMP;
+	// ^^^^^^^^^^^^^^^^^^^^^
 
-	class Button;
-
-	typedef LRESULT (CALLBACK *ButtonBack)(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-
-	/*
-		switch (message) {
-				case WM_LBUTTONUP: {
-					onClick();
-				}
-				return CallWindowProc(cnie::oldProc, hwnd, message, wParam, lParam);
-			}
-	*/
-
-	int setup(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, void(*startup)(), void(*onResize)(), bool(*onButtonClick)(int));
+	int setup(
+		HINSTANCE hInstance,
+		HINSTANCE hPrevInstance,
+		LPWSTR lpCmdLine,
+		int nCmdShow, 
+		std::function<void()> stp,
+		std::function<void()> onr,
+		std::function<bool(int)> obc,
+		std::function<void(int)> okp
+	);
 
 	ATOM myRegisterClass(HINSTANCE hInstance);
 	void InitWindow(int nCmdShow);
@@ -49,6 +47,7 @@ namespace cnie {
 	INT_PTR CALLBACK about(HWND, UINT, WPARAM, LPARAM);
 
 	void getWindowSizes();
+	void setFullscreen(bool full);
 
 	HWND createBlankButton(int x, int y, int width, int height, int id);
 	HWND createImageButton(int x, int y, int width, int height, int id);
@@ -66,6 +65,10 @@ namespace cnie {
 
 	void startCapture(HWND capWindow);
 	void stopCapture(HWND capWindow);
+	HBITMAP captureBitmap(HWND capWindow);
 	void captureFrame(HWND capWindow);
 	void getCaptureDims(HWND capWindow, int& width, int& height);
+
+	PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp);
+	void CreateBMPFile(HWND hwnd, LPTSTR pszFile, PBITMAPINFO pbi, HBITMAP hBMP, HDC hDC);
 }

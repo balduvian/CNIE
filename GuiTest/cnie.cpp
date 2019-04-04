@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "cnie.h"
 
-//DEFINE FIELDS
-WNDPROC cnie::oldProc;
-
 HWND cnie::createTextButton(int x, int y, int width, int height, int id, const wchar_t* text) {
 	HWND button = CreateWindow(
 		L"BUTTON",

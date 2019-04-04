@@ -3,6 +3,16 @@
 #include "cnie.h"
 #include <string>
 
+/*
+ * define members
+ */
+HDC cnie::camPaint;
+HDC cnie::camPaintMem;
+RECT cnie::camPaintRect;
+PAINTSTRUCT cnie::camPaintStruct;
+HBITMAP cnie::camPaintBMP;
+//
+
 void cnie::connectWebcam(HWND capWindow) {
 	SendMessage(capWindow, WM_CAP_DRIVER_CONNECT, 0, 0);
 	SendMessage(capWindow, WM_CAP_DLG_VIDEOSOURCE, 0, 0);
@@ -12,7 +22,7 @@ void cnie::startCapture(HWND capWindow) {
 	ShowWindow(capWindow, SW_SHOW);
 	SendMessage(capWindow, WM_CAP_DRIVER_CONNECT, 0, 0);
 	SendMessage(capWindow, WM_CAP_SET_SCALE, true, 0);
-	SendMessage(capWindow, WM_CAP_SET_PREVIEWRATE, 60, 0);
+	SendMessage(capWindow, WM_CAP_SET_PREVIEWRATE, 66, 0);
 	SendMessage(capWindow, WM_CAP_SET_PREVIEW, true, 0);
 }
 
@@ -21,63 +31,73 @@ void cnie::stopCapture(HWND capWindow) {
 	SendMessage(capWindow, WM_CAP_DRIVER_DISCONNECT, 0, 0);
 }
 
-void cnie::getDims(HWND capWindow, int& width, int& height) {
+void cnie::getCaptureDims(HWND capWindow, int& width, int& height) {
 	BITMAPINFO info = BITMAPINFO();
 	SendMessage(capWindow, WM_CAP_GET_VIDEOFORMAT, sizeof(BITMAPINFO), (LPARAM)&info);
-	long wid = info.bmiHeader.biWidth;
-	//const wchar_t* string = std::to_wstring(wid).c_str();
-	OutputDebugStringW(L"Kek");
-
-	/*
-	if (OpenClipboard(capWindow))
-	{
-		hbm = (HBITMAP)GetClipboardData(CF_BITMAP);
-		//SelectObject(hdcMem, hbm);
-		//GetClientRect(capWindow, &rc);
-		CloseClipboard();
-	}
-	//Save hbm to a .bmp file called Frame.bmp
-	PBITMAPINFO pbi = CreateBitmapInfoStruct(base_window, hbm);
-	OutputDebugStringW(L"My output string.");
-	*/
+	width = info.bmiHeader.biWidth;
+	height = info.bmiHeader.biHeight;
 }
 
 void cnie::captureFrame(HWND capWindow) {
-	/*
 	//Grab a Frame
 	SendMessage(capWindow, WM_CAP_GRAB_FRAME, 0, 0);
 	//Copy the frame we have just grabbed to the clipboard
 	SendMessage(capWindow, WM_CAP_EDIT_COPY, 0, 0);
 
 	//Copy the clipboard image data to a HBITMAP object called hbm
-	hdc = BeginPaint(capWindow, &ps);
-	hdcMem = CreateCompatibleDC(hdc);
-	if (hdcMem != NULL)
+	cnie::camPaint = BeginPaint(capWindow, &camPaintStruct);
+	cnie::camPaintMem = CreateCompatibleDC(cnie::camPaint);
+	if (camPaintMem != NULL)
 	{
-			if (OpenClipboard(capWindow))
-			{
-					hbm = (HBITMAP)GetClipboardData(CF_BITMAP);
-					SelectObject(hdcMem, hbm);
-					GetClientRect(capWindow, &rc);
-					CloseClipboard();
-			}
+		if (OpenClipboard(capWindow))
+		{
+			camPaintBMP = (HBITMAP)GetClipboardData(CF_BITMAP);
+			SelectObject(camPaintMem, camPaintBMP);
+			GetClientRect(capWindow, &camPaintRect);
+			CloseClipboard();
+		}
 	}
 	//Save hbm to a .bmp file called Frame.bmp
-	PBITMAPINFO pbi = CreateBitmapInfoStruct(base_window, hbm);
-	CreateBMPFile(base_window, (LPTSTR)L"Frame.bmp", pbi, hbm, hdcMem);
+	PBITMAPINFO pbi = CreateBitmapInfoStruct(base_window, camPaintBMP);
+	CreateBMPFile(base_window, (LPTSTR)L"Frame.bmp", pbi, camPaintBMP, camPaintMem);
 
-	SendMessage(capWindow, WM_CAP_DRIVER_CONNECT, 0, 0);
-	SendMessage(capWindow, WM_CAP_SET_SCALE, true, 0);
-	SendMessage(capWindow, WM_CAP_SET_PREVIEWRATE, 66, 0);
-	SendMessage(capWindow, WM_CAP_SET_PREVIEW, true, 0);
-	*/
+	cnie::startCapture(capWindow);
+}
+
+HBITMAP cnie::captureBitmap(HWND capWindow) {
+
+	HBITMAP ret = nullptr;
+
+	//Grab a Frame
+	SendMessage(capWindow, WM_CAP_GRAB_FRAME, 0, 0);
+	//Copy the frame we have just grabbed to the clipboard
+	SendMessage(capWindow, WM_CAP_EDIT_COPY, 0, 0);
+
+	//Copy the clipboard image data to a HBITMAP object called hbm
+	cnie::camPaint = BeginPaint(capWindow, &camPaintStruct);
+	cnie::camPaintMem = CreateCompatibleDC(cnie::camPaint);
+	if (camPaintMem != NULL)
+	{
+		if (OpenClipboard(capWindow))
+		{
+			ret = (HBITMAP)GetClipboardData(CF_BITMAP);
+			//SelectObject(camPaintMem, camPaintBMP);
+			//GetClientRect(capWindow, &camPaintRect);
+			CloseClipboard();
+		}
+	}
+
+	//resume device preview
+	cnie::startCapture(capWindow);
+
+	return ret;
 }
 
 HWND cnie::createCaptureWindow(int x, int y, int width, int height) {
 	return capCreateCaptureWindow(L"camera window", WS_CHILD, x, y, width, height, base_window, 0);
 }
 
-void CreateBMPFile(HWND hwnd, LPTSTR pszFile, PBITMAPINFO pbi, HBITMAP hBMP, HDC hDC) {
+void cnie::CreateBMPFile(HWND hwnd, LPTSTR pszFile, PBITMAPINFO pbi, HBITMAP hBMP, HDC hDC) {
 		HANDLE hf;                  // file handle
 		BITMAPFILEHEADER hdr;       // bitmap file-header
 		PBITMAPINFOHEADER pbih;     // bitmap info-header
@@ -141,7 +161,7 @@ void CreateBMPFile(HWND hwnd, LPTSTR pszFile, PBITMAPINFO pbi, HBITMAP hBMP, HDC
 		GlobalFree((HGLOBAL)lpBits);
 }
 
-PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp)
+PBITMAPINFO cnie::CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp)
 {
 		BITMAP bmp;
 		PBITMAPINFO pbmi;
