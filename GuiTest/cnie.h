@@ -10,6 +10,7 @@ namespace cnie {
 	extern HWND base_window;
 	extern void(*startup)();
 	extern void(*onResize)();
+	extern bool(*onButtonClick)(int id);
 	extern WNDPROC oldProc;
 	extern HHOOK keyHook;
 
@@ -26,9 +27,20 @@ namespace cnie {
 			return CallWindowProc(cnie::oldProc, hwnd, message, wParam, lParam);             \
 		}
 
-	typedef LRESULT (CALLBACK *buttonBack)(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	class Button;
 
-	int setup(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, void(*startup)(), void(*onResize)());
+	typedef LRESULT (CALLBACK *ButtonBack)(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+	/*
+		switch (message) {
+				case WM_LBUTTONUP: {
+					onClick();
+				}
+				return CallWindowProc(cnie::oldProc, hwnd, message, wParam, lParam);
+			}
+	*/
+
+	int setup(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, void(*startup)(), void(*onResize)(), bool(*onButtonClick)(int));
 
 	ATOM myRegisterClass(HINSTANCE hInstance);
 	void InitWindow(int nCmdShow);
@@ -38,14 +50,12 @@ namespace cnie {
 
 	void getWindowSizes();
 
-	HWND createBlankButton(int x, int y, int width, int height);
-	HWND createImageButton(int x, int y, int width, int height);
-	HWND createTextButton(int x, int y, int width, int height, const wchar_t* text);
+	HWND createBlankButton(int x, int y, int width, int height, int id);
+	HWND createImageButton(int x, int y, int width, int height, int id);
+	HWND createTextButton(int x, int y, int width, int height, int id, const wchar_t* text);
 
 	HANDLE loadBitmap(int id);
 	HANDLE loadBitmap(int id, int w, int h);
-
-	void registerProc(HWND button, buttonBack back);
 
 	void setButtonImage(HWND button, HANDLE image);
 	void setButtonText(HWND button, const wchar_t* text);
@@ -57,5 +67,5 @@ namespace cnie {
 	void startCapture(HWND capWindow);
 	void stopCapture(HWND capWindow);
 	void captureFrame(HWND capWindow);
-
+	void getCaptureDims(HWND capWindow, int& width, int& height);
 }

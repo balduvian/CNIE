@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <vfw.h>
 #include "cnie.h"
+#include <string>
 
 void cnie::connectWebcam(HWND capWindow) {
 	SendMessage(capWindow, WM_CAP_DRIVER_CONNECT, 0, 0);
@@ -18,6 +19,27 @@ void cnie::startCapture(HWND capWindow) {
 void cnie::stopCapture(HWND capWindow) {
 	ShowWindow(capWindow, SW_HIDE);
 	SendMessage(capWindow, WM_CAP_DRIVER_DISCONNECT, 0, 0);
+}
+
+void cnie::getDims(HWND capWindow, int& width, int& height) {
+	BITMAPINFO info = BITMAPINFO();
+	SendMessage(capWindow, WM_CAP_GET_VIDEOFORMAT, sizeof(BITMAPINFO), (LPARAM)&info);
+	long wid = info.bmiHeader.biWidth;
+	//const wchar_t* string = std::to_wstring(wid).c_str();
+	OutputDebugStringW(L"Kek");
+
+	/*
+	if (OpenClipboard(capWindow))
+	{
+		hbm = (HBITMAP)GetClipboardData(CF_BITMAP);
+		//SelectObject(hdcMem, hbm);
+		//GetClientRect(capWindow, &rc);
+		CloseClipboard();
+	}
+	//Save hbm to a .bmp file called Frame.bmp
+	PBITMAPINFO pbi = CreateBitmapInfoStruct(base_window, hbm);
+	OutputDebugStringW(L"My output string.");
+	*/
 }
 
 void cnie::captureFrame(HWND capWindow) {
@@ -42,7 +64,7 @@ void cnie::captureFrame(HWND capWindow) {
 	}
 	//Save hbm to a .bmp file called Frame.bmp
 	PBITMAPINFO pbi = CreateBitmapInfoStruct(base_window, hbm);
-	CreateBMPFile(base_window, L"Frame.bmp", pbi, hbm, hdcMem);
+	CreateBMPFile(base_window, (LPTSTR)L"Frame.bmp", pbi, hbm, hdcMem);
 
 	SendMessage(capWindow, WM_CAP_DRIVER_CONNECT, 0, 0);
 	SendMessage(capWindow, WM_CAP_SET_SCALE, true, 0);

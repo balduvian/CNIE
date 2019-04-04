@@ -12,6 +12,7 @@ WCHAR cnie::szWindowClass[MAX_LOADSTRING];
 HWND cnie::base_window;
 void(*cnie::startup)();
 void(*cnie::onResize)();
+bool(*cnie::onButtonClick)(int);
 int cnie::winWidth;
 int cnie::winHeight;
 HHOOK cnie::keyHook;
@@ -52,17 +53,19 @@ LRESULT CALLBACK cnie::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	case WM_COMMAND:
 	{
 		int wmId = LOWORD(wParam);
-		// Parse the menu selections:
-		switch (wmId) {
-		case IDM_ABOUT:
-			DialogBox(hInstance, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, about);
-			break;
-		case IDM_EXIT:
-			DestroyWindow(hWnd);
-			break;
-		default:
-			return DefWindowProc(hWnd, message, wParam, lParam);
-			break;
+		if (!onButtonClick(wmId)) {
+			// Parse the menu selections:
+			switch (wmId) {
+			case IDM_ABOUT:
+				DialogBox(hInstance, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, about);
+				break;
+			case IDM_EXIT:
+				DestroyWindow(hWnd);
+				break;
+			default:
+				return DefWindowProc(hWnd, message, wParam, lParam);
+				break;
+			}
 		}
 	}
 	break;
@@ -125,10 +128,11 @@ void cnie::InitWindow(int nCmdShow) {
 	UpdateWindow(hwnd);
 }
 
-int cnie::setup(HINSTANCE hi, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, void(*stp)(), void(*onr)()) {
+int cnie::setup(HINSTANCE hi, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, void(*stp)(), void(*onr)(), bool(*obc)(int)) {
 	hInstance = hi;
 	startup = stp;
 	onResize = onr;
+	onButtonClick = obc;
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
@@ -153,6 +157,7 @@ int cnie::setup(HINSTANCE hi, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCm
 	{
 		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
 		{
+
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
@@ -170,16 +175,14 @@ void cnie::getWindowSizes() {
 }
 
 LRESULT CALLBACK cnie::hookProc(int code, WPARAM wParam, LPARAM lParam) {
-	long ret = 1;
-
 	KBDLLHOOKSTRUCT*  kbd = (KBDLLHOOKSTRUCT*)lParam;
 
 	if (wParam == WM_KEYUP) {
 		switch (kbd->vkCode) {
 		case VK_F12:
-			exit(-2);
+			exit(0);
 		}
 	}
-	ret = CallNextHookEx(keyHook, code, wParam, lParam);
-	return ret;
+
+	return CallNextHookEx(keyHook, code, wParam, lParam);
 }
