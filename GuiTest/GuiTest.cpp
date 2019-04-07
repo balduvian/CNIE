@@ -2,17 +2,23 @@
 #include "cnie.h"
 #include <string>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 #define HOWDY_BUTTON 100
 #define PHOTOBOOTH_FRAMEBUFFER 101
+#define SETTINGS_WINDOW 102
+
+const WCHAR settingsWindowClass[MAX_LOADSTRING] = L"SettingsWindow";
 
 int numImages = 4;
 HBITMAP* photobooth_images;
-HWND frameBuffer;
 int stripBorder = 10;
 
 HWND preview1;
 HWND button1;
+HWND settings_window;
+
 int switcher = 0;
 int previewWidth = 0;
 int previewHeight = 0;
@@ -66,63 +72,109 @@ void guiCaptureStart() {
 	guiResize();
 }
 
-void drawPhotoboothImages(HWND frameBuffer, HBITMAP* images) {
-	PAINTSTRUCT ps;
-	HDC paint = BeginPaint(frameBuffer, &ps);
-	HDC imageMem;
+void drawStrip(int wd, int hgt, HBITMAP* images, HBITMAP& bmp, HDC& hdcScreen) {
+	// Get a device context to the screen.
+	hdcScreen = GetDC(NULL);
 
-	//draw images onto framebuffer
+	// Create a device context
+	HDC hdcBmp = CreateCompatibleDC(hdcScreen);
+
+	// Create a bitmap and attach it to the device context we created above...
+	bmp = CreateCompatibleBitmap(hdcScreen, wd, hgt);
+	HBITMAP hbmOld = static_cast<HBITMAP>(SelectObject(hdcBmp, bmp));
+
+	/*
+	 * drawing
+	 */
+	RECT r = { 0, 0, wd, hgt };
+	FillRect(hdcBmp, &r, static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH)));
+
 	for (int i = 0; i < numImages; ++i) {
-		imageMem = CreateCompatibleDC(paint);
-		// Select the new bitmap
+		HDC imageMem = CreateCompatibleDC(hdcBmp);
 		SelectObject(imageMem, images[i]);
 
-		// Copy the bits from the memory DC into the current dc
-		BitBlt(paint, stripBorder, stripBorder + (previewHeight + stripBorder) * i, previewWidth, previewHeight, imageMem, 0, 0, SRCCOPY);
+		int xx = stripBorder;
+		int yy = stripBorder + (previewHeight + stripBorder) * i;
+		OutputDebugStringW( (std::to_wstring(xx) + L" " + std::to_wstring(yy) + L"\n").c_str() );
+		BitBlt(hdcBmp, xx, yy, previewWidth, previewHeight, imageMem, 0, 0, SRCCOPY);
 
-		// Restore the old bitmap
 		DeleteDC(imageMem);
 		DeleteObject(images[i]);
 	}
+	/*
+	 *
+	 */
 
-	HDC bufferMem = CreateCompatibleDC(paint);
-	RECT bufferRect;
-	GetClientRect(frameBuffer, &bufferRect);
-	HBITMAP bufferImage = CreateCompatibleBitmap(bufferMem, bufferRect.right, bufferRect.bottom);
-
-	PBITMAPINFO pbi = cnie::CreateBitmapInfoStruct(cnie::base_window, bufferImage);
-	cnie::CreateBMPFile(frameBuffer, (LPTSTR)L"Strip.bmp", pbi, bufferImage, bufferMem);
-
-	EndPaint(frameBuffer, &ps);
-}
-
-HWND createFrameBuffer(int w, int h) {
-	return CreateWindow(
-		L"STATIC",
-		NULL,
-		NULL,
-		0,
-		0,
-		w,
-		h,
-		cnie::base_window,
-		(HMENU)PHOTOBOOTH_FRAMEBUFFER,
-		cnie::hInstance,
-		NULL
-	);
+	// Clean up the GDI objects we've created.
+	SelectObject(hdcBmp, hbmOld);
+	DeleteDC(hdcBmp);
 }
 
 void photoboothBegin() {
 	photobooth_images = new HBITMAP[numImages];
 
 	photobooth_images[0] = cnie::captureBitmap(preview1);
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 	photobooth_images[1] = cnie::captureBitmap(preview1);
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 	photobooth_images[2] = cnie::captureBitmap(preview1);
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 	photobooth_images[3] = cnie::captureBitmap(preview1);
 
-	drawPhotoboothImages(frameBuffer, photobooth_images);
+	HBITMAP img;
+	HDC context;
 
+	drawStrip(
+		previewWidth + 2 * stripBorder,
+		previewHeight * numImages + stripBorder * (numImages + 1),
+		photobooth_images,
+		img,
+		context
+	);
+
+	PBITMAPINFO pbi = cnie::CreateBitmapInfoStruct(cnie::base_window, img);
+	cnie::CreateBMPFile(cnie::base_window, (LPTSTR)L"Strip.bmp", pbi, img, context);
+
+	ReleaseDC(NULL, context);
 	delete photobooth_images;
+}
+
+LRESULT CALLBACK settingsProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+	case WM_COMMAND:
+	{
+		int wmId = LOWORD(wParam);
+			switch (wmId) {
+			case VK_SPACE:
+				break;
+			default:
+				return DefWindowProc(hwnd, message, wParam, lParam);
+				break;
+			}
+	}
+	break;
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hwnd, &ps);
+
+		EndPaint(hwnd, &ps);
+	}
+	break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+	case WM_SIZE:
+	{
+		
+	}
+	break;
+	break;
+	default:
+		return DefWindowProc(hwnd, message, wParam, lParam);
+	}
+	return 0;
 }
 
 void guiTestStartup() {
@@ -130,9 +182,11 @@ void guiTestStartup() {
 
 	preview1 = cnie::createCaptureWindow(10, 120, 400, 400);
 
-	guiCaptureStart();
+	cnie::registerClass(settingsProc, settingsWindowClass);
 
-	frameBuffer = createFrameBuffer(previewWidth + 2 * stripBorder, previewHeight * numImages + stripBorder * (numImages + 1));
+	settings_window = cnie::createSubWindow(settingsWindowClass, 0, 0, 100, 100, SETTINGS_WINDOW, L"Settings");
+
+	guiCaptureStart();
 }
 
 bool guiButtonClick(int id) {

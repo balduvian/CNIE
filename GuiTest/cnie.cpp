@@ -58,6 +58,23 @@ HWND cnie::createImageButton(int x, int y, int width, int height, int id) {
 	return button;
 }
 
+HWND cnie::createSubWindow(const WCHAR wClass[], int x, int y, int width, int height, int id, const wchar_t* window_name, int additionalStyles) {
+	HWND window = CreateWindowExA(
+		WS_EX_TOOLWINDOW, //style
+		(LPCSTR)wClass,
+		(LPCSTR)window_name,
+		WS_POPUPWINDOW | WS_CAPTION | additionalStyles,
+		x,
+		y,
+		width,
+		height,
+		NULL,
+		(HMENU)id,
+		hInstance,
+		NULL
+	);
+	return window;
+}
 HANDLE cnie::loadBitmap(int id) {
 	HANDLE ret = LoadImage(
 		hInstance,

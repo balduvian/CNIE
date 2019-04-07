@@ -102,13 +102,13 @@ LRESULT CALLBACK cnie::wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	return 0;
 }
 
-ATOM cnie::myRegisterClass(HINSTANCE hInstance) {
+ATOM cnie::registerClass(WNDPROC proc, const WCHAR className[]) {
 	WNDCLASSEXW wcex;
 
 	wcex.cbSize = sizeof(WNDCLASSEX);
 
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = wndProc;
+	wcex.lpfnWndProc = proc;
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
 	wcex.hInstance = hInstance;
@@ -116,10 +116,12 @@ ATOM cnie::myRegisterClass(HINSTANCE hInstance) {
 	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_GUITEST);
-	wcex.lpszClassName = szWindowClass;
+	wcex.lpszClassName = className;
 	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
-	return RegisterClassExW(&wcex);
+	ATOM ret = RegisterClassExW(&wcex);
+
+	return ret;
 }
 
 void cnie::InitWindow(int nCmdShow) {
@@ -153,13 +155,15 @@ int cnie::setup(
 
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadStringW(hInstance, IDC_GUITEST, szWindowClass, MAX_LOADSTRING);
-	myRegisterClass(hInstance);
+
+	registerClass(wndProc, szWindowClass);
 
 	InitWindow(nCmdShow);
 
 	keyHook = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, hInstance, 0);
 
 	startup();
+
 	getWindowSizes();
 
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_GUITEST));

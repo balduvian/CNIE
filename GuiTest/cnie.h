@@ -40,7 +40,7 @@ namespace cnie {
 		std::function<void(int)> okp
 	);
 
-	ATOM myRegisterClass(HINSTANCE hInstance);
+	ATOM registerClass(WNDPROC proc, const WCHAR[]);
 	void InitWindow(int nCmdShow);
 	LRESULT CALLBACK wndProc(HWND, UINT, WPARAM, LPARAM);
 	LRESULT CALLBACK hookProc(int code, WPARAM wParam, LPARAM lParam);
@@ -52,6 +52,8 @@ namespace cnie {
 	HWND createBlankButton(int x, int y, int width, int height, int id);
 	HWND createImageButton(int x, int y, int width, int height, int id);
 	HWND createTextButton(int x, int y, int width, int height, int id, const wchar_t* text);
+
+	HWND createSubWindow(const WCHAR wClass[], int x, int y, int width, int height, int id, const wchar_t* name, int addStyles = 0);
 
 	HANDLE loadBitmap(int id);
 	HANDLE loadBitmap(int id, int w, int h);

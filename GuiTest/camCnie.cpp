@@ -21,7 +21,7 @@ void cnie::connectWebcam(HWND capWindow) {
 void cnie::startCapture(HWND capWindow) {
 	ShowWindow(capWindow, SW_SHOW);
 	SendMessage(capWindow, WM_CAP_DRIVER_CONNECT, 0, 0);
-	SendMessage(capWindow, WM_CAP_SET_SCALE, true, 0);
+	SendMessage(capWindow, WM_CAP_SET_SCALE, true, false);
 	SendMessage(capWindow, WM_CAP_SET_PREVIEWRATE, 66, 0);
 	SendMessage(capWindow, WM_CAP_SET_PREVIEW, true, 0);
 }
@@ -74,15 +74,14 @@ HBITMAP cnie::captureBitmap(HWND capWindow) {
 	SendMessage(capWindow, WM_CAP_EDIT_COPY, 0, 0);
 
 	//Copy the clipboard image data to a HBITMAP object called hbm
-	cnie::camPaint = BeginPaint(capWindow, &camPaintStruct);
-	cnie::camPaintMem = CreateCompatibleDC(cnie::camPaint);
-	if (camPaintMem != NULL)
+	PAINTSTRUCT ps;
+	HDC paint = BeginPaint(capWindow, &ps);
+	HDC paintMemory = CreateCompatibleDC(paint);
+	if (paintMemory != NULL)
 	{
 		if (OpenClipboard(capWindow))
 		{
-			ret = (HBITMAP)GetClipboardData(CF_BITMAP);
-			//SelectObject(camPaintMem, camPaintBMP);
-			//GetClientRect(capWindow, &camPaintRect);
+			ret = (HBITMAP)CopyImage((HBITMAP)GetClipboardData(CF_BITMAP), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
 			CloseClipboard();
 		}
 	}
@@ -90,6 +89,7 @@ HBITMAP cnie::captureBitmap(HWND capWindow) {
 	//resume device preview
 	cnie::startCapture(capWindow);
 
+	ReleaseDC(capWindow, paint);
 	return ret;
 }
 
