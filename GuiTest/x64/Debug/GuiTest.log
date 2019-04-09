@@ -1,0 +1,13 @@
+﻿  camCnie.cpp
+c:\users\emmet\programming\lang\cpp\cnie\guitest\camcnie.cpp(1): fatal error C1083: Cannot open precompiled header file: 'x64\Debug\Photobooth.pch': No such file or directory
+  cnie.cpp
+c:\users\emmet\programming\lang\cpp\cnie\guitest\cnie.cpp(1): fatal error C1083: Cannot open precompiled header file: 'x64\Debug\Photobooth.pch': No such file or directory
+  photobooth.cpp
+c:\users\emmet\programming\lang\cpp\cnie\guitest\photobooth.cpp(1): fatal error C1083: Cannot open precompiled header file: 'x64\Debug\Photobooth.pch': No such file or directory
+  baseCnie.cpp
+c:\users\emmet\programming\lang\cpp\cnie\guitest\basecnie.cpp(1): fatal error C1083: Cannot open precompiled header file: 'x64\Debug\Photobooth.pch': No such file or directory
+  stdafx.cpp
+c:\users\emmet\programming\lang\cpp\cnie\guitest\stdafx.cpp(1): fatal error C1083: Cannot open precompiled header file: 'x64\Debug\Photobooth.pch': No such file or directory
+  timer.cpp
+c:\users\emmet\programming\lang\cpp\cnie\guitest\timer.cpp(1): fatal error C1083: Cannot open precompiled header file: 'x64\Debug\Photobooth.pch': No such file or directory
+  Generating Code...

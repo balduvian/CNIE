@@ -1,3 +1,6 @@
+#pragma comment(linker,"\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "stdafx.h"
 #include <functional>
 
@@ -14,6 +17,7 @@ namespace cnie {
 	extern std::function<void()> onResize;
 	extern std::function<bool(int)> onButtonClick;
 	extern std::function<void(int)> onKeyPress;
+	extern std::function<void(HDC)> onDraw;
 
 	extern HHOOK keyHook;
 	extern int winWidth;
@@ -31,29 +35,26 @@ namespace cnie {
 
 	int setup(
 		HINSTANCE hInstance,
-		HINSTANCE hPrevInstance,
-		LPWSTR lpCmdLine,
-		int nCmdShow, 
 		std::function<void()> stp,
 		std::function<void()> onr,
 		std::function<bool(int)> obc,
-		std::function<void(int)> okp
+		std::function<void(int)> okp,
+		std::function<void(HDC)> odw
 	);
 
 	ATOM registerClass(WNDPROC proc, const WCHAR[]);
-	void InitWindow(int nCmdShow);
+	HWND create_window(const wchar_t className[], const wchar_t title[], long& style);
+	HWND create_extended_window(const wchar_t className[], const wchar_t title[], long& style);
 	LRESULT CALLBACK wndProc(HWND, UINT, WPARAM, LPARAM);
-	LRESULT CALLBACK hookProc(int code, WPARAM wParam, LPARAM lParam);
 	INT_PTR CALLBACK about(HWND, UINT, WPARAM, LPARAM);
 
 	void getWindowSizes();
-	void setFullscreen(bool full);
+	void showWindow(HWND window, bool show);
+	void setFullscreen(HWND window, bool full);
 
 	HWND createBlankButton(int x, int y, int width, int height, int id);
 	HWND createImageButton(int x, int y, int width, int height, int id);
 	HWND createTextButton(int x, int y, int width, int height, int id, const wchar_t* text);
-
-	HWND createSubWindow(const WCHAR wClass[], int x, int y, int width, int height, int id, const wchar_t* name, int addStyles = 0);
 
 	HANDLE loadBitmap(int id);
 	HANDLE loadBitmap(int id, int w, int h);
@@ -73,4 +74,5 @@ namespace cnie {
 
 	PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp);
 	void CreateBMPFile(HWND hwnd, LPTSTR pszFile, PBITMAPINFO pbi, HBITMAP hBMP, HDC hDC);
+
 }

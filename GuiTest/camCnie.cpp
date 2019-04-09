@@ -14,15 +14,34 @@ HBITMAP cnie::camPaintBMP;
 //
 
 void cnie::connectWebcam(HWND capWindow) {
-	SendMessage(capWindow, WM_CAP_DRIVER_CONNECT, 0, 0);
-	SendMessage(capWindow, WM_CAP_DLG_VIDEOSOURCE, 0, 0);
+	CAPDRIVERCAPS CapDriverCaps = {};
+	CAPSTATUS     CapStatus = {};
+
+	capDriverGetCaps(capWindow, &CapDriverCaps, sizeof(CAPDRIVERCAPS));
+
+	if (CapDriverCaps.fHasDlgVideoSource)
+	{
+		capDlgVideoSource(capWindow);
+	}
+
+	if (CapDriverCaps.fHasDlgVideoFormat)
+	{
+		capDlgVideoFormat(capWindow);
+
+		capGetStatus(capWindow, &CapStatus, sizeof(CAPSTATUS));
+	}
+
+	if (CapDriverCaps.fHasDlgVideoDisplay)
+	{
+		capDlgVideoDisplay(capWindow);
+	}
 }
 
 void cnie::startCapture(HWND capWindow) {
 	ShowWindow(capWindow, SW_SHOW);
 	SendMessage(capWindow, WM_CAP_DRIVER_CONNECT, 0, 0);
 	SendMessage(capWindow, WM_CAP_SET_SCALE, true, false);
-	SendMessage(capWindow, WM_CAP_SET_PREVIEWRATE, 66, 0);
+	SendMessage(capWindow, WM_CAP_SET_PREVIEWRATE, 1, 0);
 	SendMessage(capWindow, WM_CAP_SET_PREVIEW, true, 0);
 }
 
@@ -32,8 +51,42 @@ void cnie::stopCapture(HWND capWindow) {
 }
 
 void cnie::getCaptureDims(HWND capWindow, int& width, int& height) {
-	BITMAPINFO info = BITMAPINFO();
-	SendMessage(capWindow, WM_CAP_GET_VIDEOFORMAT, sizeof(BITMAPINFO), (LPARAM)&info);
+	auto parms = CAPTUREPARMS();
+
+	//capCaptureGetSetup(capWindow, parms, sizeof(CAPTUREPARMS));
+
+	parms.fStepCaptureAt2x = true;
+	//parms.fYield = true;
+	//parms.fLimitEnabled = false;
+
+	capCaptureSetSetup(capWindow, &parms, sizeof(CAPTUREPARMS));
+	//SendMessage(capWindow, WM_CAP_SET_VIDEOFORMAT, sizeof(BITMAPINFO), (LPARAM)&set);
+	//BITMAPINFO info = BITMAPINFO();
+	//SendMessage(capWindow, WM_CAP_GET_VIDEOFORMAT, sizeof(BITMAPINFO), (LPARAM)&info);
+	//SendMessage(capWindow, WM_CAP_SET_MCI_DEVICE, L"avivideo=mciavi.drv", (LPARAM)&set);
+
+	OutputDebugString(std::to_wstring(parms.dwRequestMicroSecPerFrame).c_str());
+
+	//BITMAPINFO info;
+	//capGetVideoFormat(capWindow, &info, sizeof(BITMAPINFO));
+	int w = 1280;
+	int h = 960;
+	BITMAPINFO info = BITMAPINFO {
+		(DWORD)2,
+		(LONG)w,
+		(LONG)h,
+		(WORD)1,
+		(WORD)1,
+		(DWORD)BI_RGB,
+		(DWORD)(w * h * 2),
+		(LONG)1,
+		(LONG)1,
+		(DWORD)0,
+		(DWORD)0
+	};
+
+	bool g = capSetVideoFormat(capWindow, &info, sizeof(BITMAPINFO));
+
 	width = info.bmiHeader.biWidth;
 	height = info.bmiHeader.biHeight;
 }
