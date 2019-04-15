@@ -3,6 +3,8 @@ name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "stdafx.h"
 #include <functional>
+#include "opencv2/core.hpp"
+#include "opencv2/opencv.hpp"
 
 namespace cnie {
 	
@@ -24,6 +26,8 @@ namespace cnie {
 	extern int winHeight;
 	extern bool fullscreen;
 	extern long defaultStyle;
+
+	extern std::shared_ptr<cv::VideoCapture> video_capture;
 
 	int setup(
 		HINSTANCE hInstance,

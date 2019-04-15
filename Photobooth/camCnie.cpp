@@ -5,7 +5,15 @@
 #include "opencv2/core.hpp"
 #include "opencv2/opencv.hpp"
 
+std::shared_ptr<cv::VideoCapture> cnie::video_capture;
+
 void cnie::connectWebcam(HWND capWindow) {
+	video_capture = std::shared_ptr<cv::VideoCapture>(new cv::VideoCapture(0));
+	cv::Mat frame;
+	
+	std::thread camThread = std::thread(kek);
+	cv::imshow();
+	/*
 	CAPDRIVERCAPS CapDriverCaps = {};
 	CAPSTATUS     CapStatus = {};
 
@@ -26,6 +34,15 @@ void cnie::connectWebcam(HWND capWindow) {
 	if (CapDriverCaps.fHasDlgVideoDisplay)
 	{
 		capDlgVideoDisplay(capWindow);
+	}
+	*/
+}
+
+void kek(cv::VideoCapture cap, bool& running) {
+	bool running;
+	cv::Mat frame;
+	while (running) {
+
 	}
 }
 
